@@ -11,6 +11,8 @@
                 <th>Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
+                <th>Total Quota</th>
+                <th>Registered Users</th>
                 <th>Available Quota</th>
                 <th>Action</th>
             </tr>
@@ -23,6 +25,8 @@
                 <td>{{ session.date.strftime('%d %B %Y') }}</td>
                 <td>{{ session.start_time }}</td>
                 <td>{{ session.end_time }}</td>
+                <td>{{ session.quota }}</td>
+                <td>{{ session.registered_users }}</td>
                 <td>{{ session.available_quota }}</td>
                 <td>
                     {% if session.available_quota > 0 %}

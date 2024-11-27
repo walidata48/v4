@@ -44,3 +44,18 @@ class Registration(db.Model):
     
     session = db.relationship('Session', backref='registrations', lazy=True)
 
+class SessionDateCount(db.Model):
+    __tablename__ = 'session_date_counts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
+    session_date = db.Column(db.Date, nullable=False)
+    registration_count = db.Column(db.Integer, default=0)
+    
+    # Add unique constraint to prevent duplicate counts for same session-date
+    __table_args__ = (
+        db.UniqueConstraint('session_id', 'session_date', name='unique_session_date'),
+    )
+    
+    session = db.relationship('Session', backref='date_counts', lazy=True)
+

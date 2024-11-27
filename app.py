@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Session, Registration, RegistrationGroup
+from models import db, User, Session, Registration, RegistrationGroup, SessionDateCount
 from config import Config
 from datetime import timedelta, datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -141,6 +142,8 @@ def select_session(location):
         
         try:
             db.session.commit()
+            # Update counts after successful registration
+            update_session_date_counts()
             flash('Successfully registered for 4 weekly sessions!', 'success')
         except:
             db.session.rollback()
@@ -161,24 +164,53 @@ def select_session(location):
         'Sunday': start_of_week + timedelta(days=6)
     }
     
-    # Get sessions from database
-    available_sessions = Session.query.filter_by(location=location).all()
+    # First, ensure counts are up to date
+    update_session_date_counts()
     
-    # Add date and available quota attributes to each session
-    for sess in available_sessions:
-        sess.date = day_to_date[sess.day]
+    # Get sessions with their counts
+    base_sessions = Session.query.filter_by(location=location).all()
+    sessions_with_quota = []
+    
+    for base_session in base_sessions:
+        session_date = day_to_date[base_session.day].date()
         
-        # Count registrations for this specific session and date
-        registered_count = Registration.query.filter_by(
-            session_id=sess.id,
-            session_date=sess.date  # This will count registrations for this specific date
+        # Get count using both session_id and date
+        registration_count = Registration.query.filter(
+            Registration.session_id == base_session.id,
+            Registration.session_date == session_date
         ).count()
         
-        # Calculate available quota
-        sess.available_quota = sess.quota - registered_count
+        print(f"\nDEBUG: Checking session {base_session.id} for date {session_date}")
+        print(f"DEBUG: Found {registration_count} registrations")
+        
+        session_info = {
+            'id': base_session.id,
+            'location': base_session.location,
+            'day': base_session.day,
+            'date': session_date,
+            'start_time': base_session.start_time,
+            'end_time': base_session.end_time,
+            'quota': base_session.quota,
+            'registered_users': registration_count,
+            'available_quota': base_session.quota - registration_count
+        }
+        sessions_with_quota.append(session_info)
+        
+        # Debug print the actual registrations
+        registrations = Registration.query.filter(
+            Registration.session_id == base_session.id,
+            Registration.session_date == session_date
+        ).all()
+        print("\nDetailed registrations:")
+        for reg in registrations:
+            print(f"Registration ID: {reg.id}")
+            print(f"Session ID: {reg.session_id}")
+            print(f"User ID: {reg.user_id}")
+            print(f"Date: {reg.session_date}")
+            print("---")
     
     return render_template('select_session.html', 
-                         sessions=available_sessions, 
+                         sessions=sessions_with_quota, 
                          location=location)
 
 @app.route('/register_for_session/<int:session_id>', methods=['POST'])
@@ -318,6 +350,36 @@ def coach_sessions():
         })
     
     return render_template('coach_sessions.html', session_data=session_data)
+
+def update_session_date_counts():
+    """Update the session date counts table based on registrations"""
+    # Clear existing counts
+    SessionDateCount.query.delete()
+    
+    # Get all unique session-date combinations and their counts
+    counts = db.session.query(
+        Registration.session_id,
+        Registration.session_date,
+        db.func.count(Registration.id).label('count')
+    ).group_by(
+        Registration.session_id,
+        Registration.session_date
+    ).all()
+    
+    # Create new count records
+    for session_id, session_date, count in counts:
+        new_count = SessionDateCount(
+            session_id=session_id,
+            session_date=session_date,
+            registration_count=count
+        )
+        db.session.add(new_count)
+    
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        raise
 
 if __name__ == '__main__':
     with app.app_context():
