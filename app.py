@@ -246,52 +246,18 @@ def view_schedule():
         return redirect(url_for('login'))
     
     # Get user's registrations
-    registrations = Registration.query.filter_by(user_id=session['user_id']).all()
-    
-    # Get current date
-    today = datetime.today()
-    
-    # Find the start of the current week (Monday)
-    start_of_week = today - timedelta(days=today.weekday())
-    
-    # Create a mapping of day names to their dates this week
-    day_to_date = {
-        'Monday': start_of_week,
-        'Tuesday': start_of_week + timedelta(days=1),
-        'Wednesday': start_of_week + timedelta(days=2),
-        'Thursday': start_of_week + timedelta(days=3),
-        'Friday': start_of_week + timedelta(days=4),
-        'Saturday': start_of_week + timedelta(days=5),
-        'Sunday': start_of_week + timedelta(days=6)
-    }
+    registrations = Registration.query.filter_by(user_id=session['user_id']).order_by(Registration.session_date).limit(4).all()
     
     weekly_schedules = []
-    seen_sessions = set()  # To track unique sessions
-    
     for reg in registrations:
-        base_session = reg.session
-        # Get the base date for this session's day
-        base_date = day_to_date[base_session.day]
-        
-        # Generate 4 consecutive weekly sessions
-        for week in range(4):
-            session_date = base_date + timedelta(weeks=week)
-            session_identifier = (base_session.id, session_date)  # Unique identifier for the session and date
-            
-            # Only append if this session-date combination hasn't been added yet
-            if session_identifier not in seen_sessions:
-                weekly_schedules.append({
-                    'registration_id': reg.id,
-                    'location': base_session.location,
-                    'day': base_session.day,
-                    'date': session_date,
-                    'start_time': base_session.start_time,
-                    'end_time': base_session.end_time
-                })
-                seen_sessions.add(session_identifier)  # Mark this session-date as seen
-    
-    # Sort schedules by date
-    weekly_schedules.sort(key=lambda x: x['date'])
+        weekly_schedules.append({
+            'registration_id': reg.id,
+            'location': reg.session.location,
+            'day': reg.session.day,
+            'date': reg.session_date,
+            'start_time': reg.session.start_time,
+            'end_time': reg.session.end_time
+        })
     
     return render_template('view_schedule.html', weekly_schedules=weekly_schedules)
 
