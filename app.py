@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Session, Registration
+from models import db, User, Session, Registration, RegistrationGroup
 from config import Config
 from datetime import timedelta, datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -88,13 +88,64 @@ def select_session(location):
     
     if request.method == 'POST':
         session_id = request.form.get('session_id')
-        # Create registration
-        new_registration = Registration(
-            user_id=session['user_id'],
-            session_id=session_id
-        )
-        db.session.add(new_registration)
-        db.session.commit()
+        base_session = Session.query.get_or_404(session_id)
+        
+        # Check if user already has registrations
+        existing_registrations = Registration.query.filter_by(user_id=session['user_id']).first()
+        if existing_registrations:
+            flash('You already have registered sessions.', 'error')
+            return redirect(url_for('view_schedule'))
+        
+        # Calculate dates for 4 weekly sessions
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        day_to_date = {
+            'Monday': start_of_week,
+            'Tuesday': start_of_week + timedelta(days=1),
+            'Wednesday': start_of_week + timedelta(days=2),
+            'Thursday': start_of_week + timedelta(days=3),
+            'Friday': start_of_week + timedelta(days=4),
+            'Saturday': start_of_week + timedelta(days=5),
+            'Sunday': start_of_week + timedelta(days=6)
+        }
+        
+        base_date = day_to_date[base_session.day]
+        
+        # Create registration group
+        registration_group = RegistrationGroup(user_id=session['user_id'])
+        db.session.add(registration_group)
+        db.session.flush()  # To get the registration_group.id
+        
+        # Create 4 weekly sessions
+        for week in range(4):
+            session_date = base_date + timedelta(weeks=week)
+            
+            # Check quota for this specific date
+            existing_count = Registration.query.filter_by(
+                session_id=session_id,
+                session_date=session_date
+            ).count()
+            
+            if existing_count >= base_session.quota:
+                db.session.rollback()
+                flash(f'Session on {session_date.strftime("%d %B %Y")} is full.', 'error')
+                return redirect(url_for('select_session', location=location))
+            
+            new_registration = Registration(
+                user_id=session['user_id'],
+                session_id=session_id,
+                session_date=session_date,
+                registration_group_id=registration_group.id
+            )
+            db.session.add(new_registration)
+        
+        try:
+            db.session.commit()
+            flash('Successfully registered for 4 weekly sessions!', 'success')
+        except:
+            db.session.rollback()
+            flash('An error occurred during registration.', 'error')
+            
         return redirect(url_for('view_schedule'))
     
     # Get current date
@@ -224,6 +275,40 @@ def logout():
     session.pop('user_id', None)
     session.pop('is_coach', None)
     return redirect(url_for('home'))
+
+@app.route('/coach/sessions')
+def coach_sessions():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    
+    # Get all sessions with their registrations
+    sessions = Session.query.all()
+    session_data = []
+    
+    for base_session in sessions:
+        # Get all dates for this session
+        registrations = Registration.query.filter_by(session_id=base_session.id)\
+            .order_by(Registration.session_date).all()
+        
+        # Group registrations by date
+        date_groups = {}
+        for reg in registrations:
+            date_str = reg.session_date.strftime('%Y-%m-%d')
+            if date_str not in date_groups:
+                date_groups[date_str] = {
+                    'date': reg.session_date,
+                    'registered_users': [],
+                    'count': 0
+                }
+            date_groups[date_str]['registered_users'].append(reg.user)
+            date_groups[date_str]['count'] += 1
+        
+        session_data.append({
+            'session': base_session,
+            'dates': date_groups
+        })
+    
+    return render_template('coach_sessions.html', session_data=session_data)
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Session Overview</h1>
+
+{% for data in session_data %}
+    <div class="session-block mb-4">
+        <h3>{{ data.session.location }} - {{ data.session.day }} 
+            ({{ data.session.start_time }} - {{ data.session.end_time }})</h3>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Registered Users</th>
+                    <th>Available Spots</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for date_info in data.dates.values() %}
+                <tr>
+                    <td>{{ date_info.date.strftime('%d %B %Y') }}</td>
+                    <td>
+                        <ul>
+                            {% for user in date_info.registered_users %}
+                            <li>{{ user.name }} ({{ user.email }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ data.session.quota - date_info.count }} / {{ data.session.quota }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endfor %}
+{% endblock %} 
