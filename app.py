@@ -229,6 +229,7 @@ def view_schedule():
     }
     
     weekly_schedules = []
+    seen_sessions = set()  # To track unique sessions
     
     for reg in registrations:
         base_session = reg.session
@@ -237,17 +238,20 @@ def view_schedule():
         
         # Generate 4 consecutive weekly sessions
         for week in range(4):
-            # Calculate the date for this week's session
             session_date = base_date + timedelta(weeks=week)
+            session_identifier = (base_session.id, session_date)  # Unique identifier for the session and date
             
-            weekly_schedules.append({
-                'registration_id': reg.id,
-                'location': base_session.location,
-                'day': base_session.day,
-                'date': session_date,
-                'start_time': base_session.start_time,
-                'end_time': base_session.end_time
-            })
+            # Only append if this session-date combination hasn't been added yet
+            if session_identifier not in seen_sessions:
+                weekly_schedules.append({
+                    'registration_id': reg.id,
+                    'location': base_session.location,
+                    'day': base_session.day,
+                    'date': session_date,
+                    'start_time': base_session.start_time,
+                    'end_time': base_session.end_time
+                })
+                seen_sessions.add(session_identifier)  # Mark this session-date as seen
     
     # Sort schedules by date
     weekly_schedules.sort(key=lambda x: x['date'])
