@@ -367,10 +367,26 @@ def edit_registration(registration_id):
             
         new_session = Session.query.get_or_404(new_session_id)
         
+        # Calculate the new date based on the selected session's day
+        # First, get the start of the week for the original session date
+        original_week_start = registration.session_date - timedelta(days=registration.session_date.weekday())
+        
+        # Calculate the new date by adding the appropriate number of days based on the new session's day
+        day_to_number = {
+            'Monday': 0,
+            'Tuesday': 1,
+            'Wednesday': 2,
+            'Thursday': 3,
+            'Friday': 4,
+            'Saturday': 5,
+            'Sunday': 6
+        }
+        new_date = original_week_start + timedelta(days=day_to_number[new_session.day])
+        
         # Check quota for the new session
         existing_count = Registration.query.filter_by(
             session_id=new_session_id,
-            session_date=registration.session_date  # Keep the same date
+            session_date=new_date
         ).count()
         
         if existing_count >= new_session.quota:
@@ -378,8 +394,9 @@ def edit_registration(registration_id):
             return redirect(url_for('edit_registration', registration_id=registration_id))
         
         try:
-            # Update only the session_id, keep the original date
+            # Update both session_id and session_date
             registration.session_id = new_session_id
+            registration.session_date = new_date
             
             db.session.commit()
             flash('Registration updated successfully!', 'success')
