@@ -11,7 +11,7 @@
                 <th>Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
-                <th>Quota</th>
+                <th>Available Quota</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -23,9 +23,13 @@
                 <td>{{ session.date.strftime('%d %B %Y') }}</td>
                 <td>{{ session.start_time }}</td>
                 <td>{{ session.end_time }}</td>
-                <td>{{ session.quota }}</td>
+                <td>{{ session.available_quota }}</td>
                 <td>
-                    <button type="submit" name="session_id" value="{{ session.id }}" class="btn btn-success">Register</button>
+                    {% if session.available_quota > 0 %}
+                        <button type="submit" name="session_id" value="{{ session.id }}" class="btn btn-success">Register</button>
+                    {% else %}
+                        <button type="button" class="btn btn-secondary" disabled>Full</button>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

@@ -150,11 +150,7 @@ def select_session(location):
     
     # Get current date
     today = datetime.today()
-    
-    # Find the start of the current week (Monday)
     start_of_week = today - timedelta(days=today.weekday())
-    
-    # Create a mapping of day names to their dates this week
     day_to_date = {
         'Monday': start_of_week,
         'Tuesday': start_of_week + timedelta(days=1),
@@ -168,9 +164,18 @@ def select_session(location):
     # Get sessions from database
     available_sessions = Session.query.filter_by(location=location).all()
     
-    # Add date attribute to each session based on its day name
+    # Add date and available quota attributes to each session
     for sess in available_sessions:
         sess.date = day_to_date[sess.day]
+        
+        # Count registrations for this specific session and date
+        registered_count = Registration.query.filter_by(
+            session_id=sess.id,
+            session_date=sess.date  # This will count registrations for this specific date
+        ).count()
+        
+        # Calculate available quota
+        sess.available_quota = sess.quota - registered_count
     
     return render_template('select_session.html', 
                          sessions=available_sessions, 
