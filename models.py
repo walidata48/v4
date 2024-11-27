@@ -9,6 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_coach = db.Column(db.Boolean, default=False)
+    registrations = db.relationship('Registration', backref='user', lazy=True)
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +18,12 @@ class Session(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     quota = db.Column(db.Integer, nullable=False)
+    registrations = db.relationship('Registration', backref='session', lazy=True)
+
+    @classmethod
+    def get(cls, session_id):
+        """Helper method to get a session by ID"""
+        return cls.query.get_or_404(session_id)
 
 class Registration(db.Model):
     id = db.Column(db.Integer, primary_key=True)

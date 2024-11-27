@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Session, Registration
 from config import Config
+from datetime import timedelta
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -62,8 +63,74 @@ def dashboard():
         registrations = Registration.query.all()
         return render_template('coach_dashboard.html', user=user, registrations=registrations)
     else:
-        sessions = Session.query.all()
-        return render_template('user_dashboard.html', user=user, sessions=sessions)
+        return redirect(url_for('select_location'))
+
+@app.route('/select_location', methods=['GET', 'POST'])
+def select_location():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        location = request.form['location']
+        return redirect(url_for('select_session', location=location))
+    
+    locations = Session.query.with_entities(Session.location).distinct().all()
+    return render_template('select_location.html', locations=locations)
+
+@app.route('/select_session/<location>', methods=['GET', 'POST'])
+def select_session(location):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    sessions = Session.query.filter_by(location=location).all()
+    
+    if request.method == 'POST':
+        session_id = request.form['session_id']
+        return redirect(url_for('register_for_session', session_id=session_id))
+    
+    return render_template('select_session.html', sessions=sessions)
+
+@app.route('/register_for_session/<int:session_id>', methods=['GET', 'POST'])
+def register_for_session(session_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    session_obj = Session.query.get(session_id)
+    
+    if request.method == 'POST':
+        # Check if user has already registered for 4 sessions
+        user_registrations = Registration.query.filter_by(user_id=user_id).count()
+        if user_registrations >= 4:
+            return "You have reached your registration limit."
+        
+        # Register the user for the session
+        new_registration = Registration(user_id=user_id, session_id=session_id)
+        db.session.add(new_registration)
+        db.session.commit()
+        
+        return redirect(url_for('view_schedule'))
+    
+    return render_template('register_for_session.html', session=session_obj)
+
+@app.route('/view_schedule')
+def view_schedule():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    registrations = Registration.query.filter_by(user_id=user_id).all()
+    
+    # Calculate the schedule based on the first session date
+    schedule = []
+    for registration in registrations:
+        session_obj = Session.query.get(registration.session_id)
+        # Assuming the session_obj has a start_date attribute
+        start_date = session_obj.start_time  # Adjust this to your actual start date attribute
+        for i in range(4):
+            schedule.append(start_date + timedelta(weeks=i))
+    
+    return render_template('view_schedule.html', schedule=schedule)
 
 @app.route('/logout')
 def logout():

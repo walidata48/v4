@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Select Session at {{ location }}</h1>
+<form method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Quota</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ session.location }}</td>
+                <td>{{ session.day }}</td>
+                <td>{{ session.start_time }}</td>
+                <td>{{ session.end_time }}</td>
+                <td>{{ session.quota }}</td>
+                <td>
+                    <button type="submit" name="session_id" value="{{ session.id }}" class="btn btn-success">Register</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% endblock %} 

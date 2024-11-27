@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Select Location</h1>
+<form method="post">
+    <div class="form-group">
+        <label for="location">Choose a location:</label>
+        <select class="form-control" id="location" name="location">
+            {% for location in locations %}
+                <option value="{{ location.location }}">{{ location.location }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+{% endblock %} 

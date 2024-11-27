@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Register for Session</h1>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Location:</strong> {{ session.location }}</p>
+        <p><strong>Day:</strong> {{ session.day }}</p>
+        <p><strong>Start Time:</strong> {{ session.start_time }}</p>
+        <p><strong>End Time:</strong> {{ session.end_time }}</p>
+        <p><strong>Quota:</strong> {{ session.quota }}</p>
+        <form method="post">
+            <button type="submit" class="btn btn-primary">Confirm Registration</button>
+        </form>
+    </div>
+</div>
+{% endblock %} 
