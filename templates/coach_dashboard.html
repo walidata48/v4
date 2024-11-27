@@ -16,7 +16,7 @@
     <tbody>
         {% for registration in registrations %}
         <tr>
-            <td>{{ registration.user.name }}</td>
+            <td>{{ registration.registered_user.name }}</td>
             <td>{{ registration.session.location }}</td>
             <td>{{ registration.session.day }}</td>
             <td>{{ registration.session.start_time }}</td>
