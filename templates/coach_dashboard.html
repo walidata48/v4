@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome, Coach {{ user.name }}</h2>
+<h3>Registrations</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Session Location</th>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registration in registrations %}
+        <tr>
+            <td>{{ registration.user.name }}</td>
+            <td>{{ registration.session.location }}</td>
+            <td>{{ registration.session.day }}</td>
+            <td>{{ registration.session.start_time }}</td>
+            <td>{{ registration.session.end_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 
