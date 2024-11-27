@@ -22,10 +22,10 @@
             <td>{{ schedule.date.strftime('%d %B %Y') }}</td>
             <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
             <td>
-                {% if loop.index == 1 %}
-                <form method="POST" action="{{ url_for('cancel_registration', registration_id=schedule.registration_id) }}">
-                    <button type="submit" class="btn btn-danger">Cancel All Sessions</button>
-                </form>
+                {% if loop.index == weekly_schedules|length %}
+                    <form method="GET" action="{{ url_for('edit_registration', registration_id=schedule.registration_id) }}">
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </form>
                 {% endif %}
             </td>
         </tr>

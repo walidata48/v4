@@ -381,6 +381,58 @@ def update_session_date_counts():
         db.session.rollback()
         raise
 
+@app.route('/edit_registration/<int:registration_id>', methods=['GET', 'POST'])
+def edit_registration(registration_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    registration = Registration.query.get_or_404(registration_id)
+    
+    # Verify that the registration belongs to the logged-in user
+    if registration.user_id != session['user_id']:
+        abort(403)
+    
+    if request.method == 'POST':
+        new_session_id = request.form.get('session_id')
+        
+        if not new_session_id:
+            flash('Please select a session', 'error')
+            return redirect(url_for('edit_registration', registration_id=registration_id))
+            
+        new_session = Session.query.get_or_404(new_session_id)
+        
+        # Check quota for the new session
+        existing_count = Registration.query.filter_by(
+            session_id=new_session_id,
+            session_date=registration.session_date  # Keep the same date
+        ).count()
+        
+        if existing_count >= new_session.quota:
+            flash('Selected session is full for this date.', 'error')
+            return redirect(url_for('edit_registration', registration_id=registration_id))
+        
+        try:
+            # Update only the session_id, keep the original date
+            registration.session_id = new_session_id
+            
+            db.session.commit()
+            flash('Registration updated successfully!', 'success')
+            return redirect(url_for('view_schedule'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating registration. Please try again.', 'error')
+            print(f"Error: {str(e)}")  # For debugging
+            return redirect(url_for('edit_registration', registration_id=registration_id))
+    
+    # GET request - show the edit form
+    # Get available sessions for the same location
+    current_location = registration.session.location
+    available_sessions = Session.query.filter_by(location=current_location).all()
+    
+    return render_template('edit_registration.html', 
+                         registration=registration, 
+                         sessions=available_sessions)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

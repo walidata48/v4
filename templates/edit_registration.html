@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Registration</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Current Session</h5>
+            <p>Location: {{ registration.session.location }}</p>
+            <p>Day: {{ registration.session.day }}</p>
+            <p>Time: {{ registration.session.start_time }} - {{ registration.session.end_time }}</p>
+            <p>Date: {{ registration.session_date.strftime('%d %B %Y') }}</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="session_id"><strong>Select New Session</strong></label>
+            <select name="session_id" id="session_id" class="form-control" required>
+                <option value="">-- Select a Session --</option>
+                {% for session in sessions %}
+                    <option value="{{ session.id }}" 
+                            {% if session.id == registration.session_id %}selected{% endif %}>
+                        {{ session.location }} - {{ session.day }} 
+                        ({{ session.start_time }} - {{ session.end_time }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-3">Update Registration</button>
+        <a href="{{ url_for('view_schedule') }}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+{% endblock %} 
