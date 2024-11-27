@@ -2,11 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Session, Registration
 from config import Config
-from datetime import timedelta
+from datetime import timedelta, datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+# db = SQLAlchemy(app)
+# migrate = Migrate(app, db)
 
 @app.route('/')
 def home():
@@ -82,13 +86,33 @@ def select_session(location):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    sessions = Session.query.filter_by(location=location).all()
+    # Get current date
+    today = datetime.today()
     
-    if request.method == 'POST':
-        session_id = request.form['session_id']
-        return redirect(url_for('register_for_session', session_id=session_id))
+    # Find the start of the current week (Monday)
+    start_of_week = today - timedelta(days=today.weekday())
     
-    return render_template('select_session.html', sessions=sessions)
+    # Create a mapping of day names to their dates this week
+    day_to_date = {
+        'Monday': start_of_week,
+        'Tuesday': start_of_week + timedelta(days=1),
+        'Wednesday': start_of_week + timedelta(days=2),
+        'Thursday': start_of_week + timedelta(days=3),
+        'Friday': start_of_week + timedelta(days=4),
+        'Saturday': start_of_week + timedelta(days=5),
+        'Sunday': start_of_week + timedelta(days=6)
+    }
+    
+    # Get sessions from database
+    available_sessions = Session.query.filter_by(location=location).all()
+    
+    # Add date attribute to each session based on its day name
+    for sess in available_sessions:
+        sess.date = day_to_date[sess.day]
+    
+    return render_template('select_session.html', 
+                         sessions=available_sessions, 
+                         location=location)
 
 @app.route('/register_for_session/<int:session_id>', methods=['GET', 'POST'])
 def register_for_session(session_id):

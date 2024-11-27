@@ -8,6 +8,7 @@
             <tr>
                 <th>Location</th>
                 <th>Day</th>
+                <th>Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
                 <th>Quota</th>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ session.location }}</td>
                 <td>{{ session.day }}</td>
+                <td>{{ session.date.strftime('%d %B %Y') }}</td>
                 <td>{{ session.start_time }}</td>
                 <td>{{ session.end_time }}</td>
                 <td>{{ session.quota }}</td>

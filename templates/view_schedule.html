@@ -1,19 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Your Schedule</h1>
+<h1>My Schedule</h1>
+
+{% if registrations %}
 <table class="table">
     <thead>
         <tr>
-            <th>Session Date</th>
+            <th>Location</th>
+            <th>Day</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
-        {% for date in schedule %}
+        {% for schedule in weekly_schedules %}
         <tr>
-            <td>{{ date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ schedule.location }}</td>
+            <td>{{ schedule.day }}</td>
+            <td>{{ schedule.date.strftime('%d %B %Y') }}</td>
+            <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
+            <td>
+                {% if loop.index == 1 %}
+                <form method="POST" action="{{ url_for('cancel_registration', registration_id=schedule.registration_id) }}">
+                    <button type="submit" class="btn btn-danger">Cancel All Sessions</button>
+                </form>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+{% else %}
+<p>You haven't registered for any sessions yet.</p>
+{% endif %}
+
+<a href="{{ url_for('select_location') }}" class="btn btn-primary">Register New Session</a>
 {% endblock %} 
