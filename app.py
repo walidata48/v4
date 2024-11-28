@@ -59,14 +59,42 @@ def login():
             return "Invalid email or password"
     return render_template('login.html')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET'])
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    
     user = User.query.get(session['user_id'])
     if session['is_coach']:
-        registrations = Registration.query.all()
-        return render_template('coach_dashboard.html', user=user, registrations=registrations)
+        # Get date filter from request args
+        date_filter = request.args.get('date_filter')
+        
+        # Set default to today's date if no filter is applied
+        if not date_filter:
+            date_filter = datetime.today().strftime('%Y-%m-%d')
+        
+        # Query registrations with joined data
+        registrations = Registration.query\
+            .join(User, Registration.user_id == User.id)\
+            .join(Session, Registration.session_id == Session.id)\
+            .add_columns(
+                User.name.label('user_name'),
+                Session.location,
+                Session.day,
+                Session.start_time,
+                Session.end_time,
+                Registration.session_date
+            )
+            
+        # Convert string date to datetime for filtering
+        filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+        registrations = registrations.filter(Registration.session_date == filter_date)
+        
+        registrations = registrations.all()
+        return render_template('coach_dashboard.html', 
+                             user=user, 
+                             registrations=registrations,
+                             selected_date=date_filter)
     else:
         return redirect(url_for('select_location'))
 
