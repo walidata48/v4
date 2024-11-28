@@ -19,28 +19,35 @@
 </form>
 
 <h3>Registrations</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Session Location</th>
-            <th>Session Day</th>
-            <th>Session Date</th>
-            <th>Time</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for reg in registrations %}
-        <tr>
-            <td>{{ reg.user_name }}</td>
-            <td>{{ reg.location }}</td>
-            <td>{{ reg.day }}</td>
-            <td>{{ reg.session_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ reg.start_time }} - {{ reg.end_time }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<form method="POST" action="{{ url_for('check_users') }}">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Session Location</th>
+                <th>Session Day</th>
+                <th>Session Date</th>
+                <th>Time</th>
+                <th>Checked</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in registrations %}
+            <tr>
+                <td>{{ reg.user_name }}</td>
+                <td>{{ reg.location }}</td>
+                <td>{{ reg.day }}</td>
+                <td>{{ reg.session_date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ reg.start_time }} - {{ reg.end_time }}</td>
+                <td>
+                    <input type="checkbox" name="checked_users" value="{{ reg.id }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 {% if not registrations %}
 <p>No registrations found for the selected date.</p>

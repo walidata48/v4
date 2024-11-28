@@ -345,6 +345,23 @@ def coach_sessions():
     
     return render_template('coach_sessions.html', session_data=session_data)
 
+@app.route('/coach/check_users', methods=['POST'])
+def check_users():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    
+    checked_users = request.form.getlist('checked_users')  # Get list of checked user IDs
+    # Process the checked users as needed (e.g., mark them as attended)
+    
+    # Example: Print the checked user IDs for debugging
+    print("Checked Users:", checked_users)
+    
+    # You can also save this information to the database if needed
+    # For example, you might want to create an Attendance record or update a field in Registration
+    
+    flash('Checked users processed successfully!', 'success')
+    return redirect(url_for('coach_sessions'))  # Redirect back to the coach sessions page
+
 def update_session_date_counts():
     """Update the session date counts table based on registrations"""
     # Clear existing counts
