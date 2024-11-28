@@ -59,3 +59,19 @@ class SessionDateCount(db.Model):
     
     session = db.relationship('Session', backref='date_counts', lazy=True)
 
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    coach_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    registration_id = db.Column(db.Integer, db.ForeignKey('registration.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', foreign_keys=[user_id], backref='attendances_as_user')
+    coach = db.relationship('User', foreign_keys=[coach_id], backref='attendances_as_coach')
+    registration = db.relationship('Registration', backref='attendances')
+
+    def __repr__(self):
+        return f'<Attendance {self.id} User:{self.user_id} Date:{self.date}>'
+

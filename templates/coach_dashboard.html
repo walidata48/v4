@@ -20,6 +20,7 @@
 
 <h3>Registrations</h3>
 <form method="POST" action="{{ url_for('check_users') }}">
+    <input type="hidden" name="date_filter" value="{{ selected_date }}">
     <table class="table">
         <thead>
             <tr>
@@ -28,7 +29,7 @@
                 <th>Session Day</th>
                 <th>Session Date</th>
                 <th>Time</th>
-                <th>Checked</th>
+                <th>Mark Attendance</th>
             </tr>
         </thead>
         <tbody>
@@ -40,13 +41,13 @@
                 <td>{{ reg.session_date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ reg.start_time }} - {{ reg.end_time }}</td>
                 <td>
-                    <input type="checkbox" name="checked_users" value="{{ reg.id }}">
+                    <input type="checkbox" name="checked_users" value="{{ reg.Registration.id }}">
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Submit Attendance</button>
 </form>
 
 {% if not registrations %}

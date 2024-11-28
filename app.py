@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Session, Registration, RegistrationGroup, SessionDateCount
+from models import db, User, Session, Registration, RegistrationGroup, SessionDateCount, Attendance
 from config import Config
 from datetime import timedelta, datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 # db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
+migrate = Migrate(app, db)
 
 @app.route('/')
 def home():
@@ -350,17 +350,55 @@ def check_users():
     if 'user_id' not in session or not session.get('is_coach'):
         return redirect(url_for('login'))
     
-    checked_users = request.form.getlist('checked_users')  # Get list of checked user IDs
-    # Process the checked users as needed (e.g., mark them as attended)
+    checked_registration_ids = request.form.getlist('checked_users')
+    date_filter = request.form.get('date_filter')
     
-    # Example: Print the checked user IDs for debugging
-    print("Checked Users:", checked_users)
+    if not checked_registration_ids:
+        flash('No users were selected.', 'error')
+        return redirect(url_for('dashboard'))
     
-    # You can also save this information to the database if needed
-    # For example, you might want to create an Attendance record or update a field in Registration
-    
-    flash('Checked users processed successfully!', 'success')
-    return redirect(url_for('coach_sessions'))  # Redirect back to the coach sessions page
+    try:
+        # Get the registrations that were checked
+        registrations = Registration.query\
+            .filter(Registration.id.in_(checked_registration_ids))\
+            .all()
+        
+        # Create attendance records for each checked registration
+        for registration in registrations:
+            # Check if attendance record already exists
+            existing_attendance = Attendance.query.filter_by(
+                registration_id=registration.id,
+                date=registration.session_date
+            ).first()
+            
+            if not existing_attendance:
+                attendance = Attendance(
+                    user_id=registration.user_id,
+                    coach_id=session['user_id'],
+                    registration_id=registration.id,
+                    date=registration.session_date
+                )
+                db.session.add(attendance)
+        
+        db.session.commit()
+        flash('Attendance recorded successfully!', 'success')
+        
+        # Fetch the newly created attendance records for display
+        attendances = Attendance.query\
+            .join(Registration)\
+            .join(User, Attendance.user_id == User.id)\
+            .filter(Attendance.registration_id.in_(checked_registration_ids))\
+            .all()
+            
+        return render_template('attendance_recap.html', 
+                             attendances=attendances,
+                             date=date_filter)
+                             
+    except Exception as e:
+        db.session.rollback()
+        flash('Error recording attendance. Please try again.', 'error')
+        print(f"Error: {str(e)}")  # For debugging
+        return redirect(url_for('dashboard'))
 
 def update_session_date_counts():
     """Update the session date counts table based on registrations"""
