@@ -19,10 +19,10 @@
         </div>
     </form>
 
-    {% if registrations %}
-        <p>Number of registrations: {{ registrations|length }}</p>
+    {% if attendances %}
+        <p>Number of attendances: {{ attendances|length }}</p>
     {% else %}
-        <p>No registrations found for this date.</p>
+        <p>No attendances found for this date.</p>
     {% endif %}
 
     <div class="card mb-4">
@@ -33,22 +33,16 @@
                         <th>Student Name</th>
                         <th>Session Location</th>
                         <th>Session Time</th>
-                        <th>Status</th>
+                        <th>Time Marked</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for reg in registrations %}
+                    {% for attendance in attendances %}
                     <tr>
-                        <td>{{ reg.registered_user.name }}</td>
-                        <td>{{ reg.session.location }}</td>
-                        <td>{{ reg.session.start_time }} - {{ reg.session.end_time }}</td>
-                        <td>
-                            {% if reg.attendances %}
-                                <span class="badge bg-success">Present</span>
-                            {% else %}
-                                <span class="badge bg-danger">Absent</span>
-                            {% endif %}
-                        </td>
+                        <td>{{ attendance.user.name }}</td>
+                        <td>{{ attendance.registration.session.location }}</td>
+                        <td>{{ attendance.registration.session.start_time }} - {{ attendance.registration.session.end_time }}</td>
+                        <td>{{ attendance.created_at.strftime('%H:%M:%S') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

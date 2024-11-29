@@ -393,14 +393,18 @@ def check_users():
             return redirect(url_for('dashboard'))
     
     # Get all registrations for the selected date
-    all_registrations = Registration.query\
-        .join(User)\
+    all_attendances = Attendance.query\
+        .join(User, Attendance.user_id == User.id)\
+        .join(Registration)\
         .join(Session)\
-        .filter(Registration.session_date == datetime.strptime(date_filter, '%Y-%m-%d').date())\
+        .filter(
+            Attendance.date == datetime.strptime(date_filter, '%Y-%m-%d').date(),
+            Attendance.coach_id == session['user_id']
+        )\
         .all()
         
     return render_template('attendance_recap.html', 
-                         registrations=all_registrations,
+                         attendances=all_attendances,
                          date=date_filter)
 
 def update_session_date_counts():
