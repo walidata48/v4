@@ -513,6 +513,32 @@ def edit_registration(registration_id):
                          registration=registration, 
                          sessions=available_sessions)
 
+@app.route('/coach/super_dashboard')
+def coach_super_dashboard():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    return render_template('coach_super_dashboard.html', user=user)
+
+@app.route('/coach/members')
+def manage_members():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    return render_template('manage_members.html')
+
+@app.route('/coach/reports')
+def view_reports():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    return render_template('reports.html')
+
+@app.route('/coach/settings')
+def coach_settings():
+    if 'user_id' not in session or not session.get('is_coach'):
+        return redirect(url_for('login'))
+    return render_template('coach_settings.html')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

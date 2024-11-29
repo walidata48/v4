@@ -6,33 +6,83 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
     <title>Swimming Training Course</title>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('home') }}">Swimming Course</a>
-        <div class="collapse navbar-collapse">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
+            <i class="fas fa-swimming-pool mr-2"></i>Swimming Course
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ml-auto">
                 {% if session.get('user_id') %}
+                    {% if session.get('is_coach') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" 
+                               data-toggle="dropdown">
+                                <i class="fas fa-user-shield nav-icon"></i>Admin
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ url_for('coach_super_dashboard') }}">
+                                    <i class="fas fa-tachometer-alt nav-icon"></i>Dashboard
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('coach_sessions') }}">
+                                    <i class="fas fa-calendar-alt nav-icon"></i>Manage Sessions
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('check_users') }}">
+                                    <i class="fas fa-clipboard-check nav-icon"></i>Take Attendance
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-users nav-icon"></i>Manage Members
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-chart-line nav-icon"></i>Reports
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cog nav-icon"></i>Settings
+                                </a>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a class="nav-link" href="{{ url_for('view_schedule') }}">
+                            <i class="fas fa-calendar nav-icon"></i>My Schedule
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt nav-icon"></i>Logout
+                        </a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt nav-icon"></i>Login
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus nav-icon"></i>Register
+                        </a>
                     </li>
                 {% endif %}
             </ul>
         </div>
     </nav>
-    <div class="container">
+    
+    <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html> 
