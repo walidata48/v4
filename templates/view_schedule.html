@@ -20,7 +20,7 @@
             <td>{{ schedule.location }}</td>
             <td>{{ schedule.day }}</td>
             <td>{{ schedule.date.strftime('%d %B %Y') }}</td>
-            <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
+            <td>{{ schedule.start_time.strftime('%H:%M') }} - {{ schedule.end_time.strftime('%H:%M') }}</td>
             <td>
                 {% if loop.index == weekly_schedules|length %}
                     <form method="GET" action="{{ url_for('edit_registration', registration_id=schedule.registration_id) }}">
@@ -36,5 +36,5 @@
 <p>You haven't registered for any sessions yet.</p>
 {% endif %}
 
-<a href="{{ url_for('select_location') }}" class="btn btn-primary">Register New Session</a>
+<a href="{{ url_for('select_location') }}" class="btn btn-primary mt-3">Register New Session</a>
 {% endblock %} 

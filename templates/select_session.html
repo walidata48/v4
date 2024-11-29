@@ -3,36 +3,28 @@
 {% block content %}
 <h1>Select Session at {{ location }}</h1>
 <form method="post">
-    <table class="table">
+    <table class="table modern-table">
         <thead>
             <tr>
-                <th>Location</th>
                 <th>Day</th>
                 <th>Date</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Total Quota</th>
-                <th>Registered Users</th>
-                <th>Available Quota</th>
+                <th>Time</th>
+                
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             {% for session in sessions %}
             <tr>
-                <td>{{ session.location }}</td>
                 <td>{{ session.day }}</td>
-                <td>{{ session.date.strftime('%d %B %Y') }}</td>
-                <td>{{ session.start_time }}</td>
-                <td>{{ session.end_time }}</td>
-                <td>{{ session.quota }}</td>
-                <td>{{ session.registered_users }}</td>
-                <td>{{ session.available_quota }}</td>
+                <td>{{ session.date.strftime('%d-%m-%Y') }}</td>
+                <td>{{ session.start_time.strftime('%H:%M') }} - {{ session.end_time.strftime('%H:%M') }}</td>
+                
                 <td>
                     {% if session.available_quota > 0 %}
-                        <button type="submit" name="session_id" value="{{ session.id }}" class="btn btn-success">Register</button>
+                        <button type="submit" name="session_id" value="{{ session.id }}" class="btn btn-success btn-small">Register</button>
                     {% else %}
-                        <button type="button" class="btn btn-secondary" disabled>Full</button>
+                        <button type="button" class="btn btn-secondary btn-small" disabled>Full</button>
                     {% endif %}
                 </td>
             </tr>
