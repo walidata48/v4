@@ -73,10 +73,19 @@ def dashboard():
         if not date_filter:
             date_filter = datetime.today().strftime('%Y-%m-%d')
         
-        # Query registrations with joined data
+        # Convert string date to datetime for filtering
+        filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+        
+        # Query registrations with joined data, excluding those already marked
         registrations = Registration.query\
             .join(User, Registration.user_id == User.id)\
             .join(Session, Registration.session_id == Session.id)\
+            .outerjoin(Attendance, (Attendance.registration_id == Registration.id) & 
+                       (Attendance.date == filter_date))\
+            .filter(
+                Attendance.id == None,  # Only include registrations without attendance records
+                Registration.session_date == filter_date  # Ensure the session date matches
+            )\
             .add_columns(
                 User.name.label('user_name'),
                 Session.location,
@@ -84,13 +93,9 @@ def dashboard():
                 Session.start_time,
                 Session.end_time,
                 Registration.session_date
-            )
-            
-        # Convert string date to datetime for filtering
-        filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-        registrations = registrations.filter(Registration.session_date == filter_date)
+            )\
+            .all()
         
-        registrations = registrations.all()
         return render_template('coach_dashboard.html', 
                              user=user, 
                              registrations=registrations,
