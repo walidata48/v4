@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero__content">
+            <!-- Left Content -->
+            <div class="hero__text" data-aos="fade-up">
+                <h1 class="hero__title">
+                    Mulai Perjalanan Renang Anda <span class="gradient-text">Hari Ini</span>
+                </h1>
+                <p class="hero__subtitle">
+                    Bergabunglah dengan komunitas kami dan ubah hidup Anda dengan latihan yang dipersonalisasi, 
+                    bimbingan ahli, dan hasil yang terbukti.
+                </p>
+
+                <!-- CTA Buttons -->
+                <div class="hero__actions">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">
+                        Mulai Gratis
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline">
+                        Masuk
+                    </a>
+                </div>
+
+                <!-- Trust Indicators -->
+                <div class="trust-badges">
+                    <div class="trust-badge">
+                        <i class="fas fa-users"></i>
+                        <p>10k+ Pengguna Aktif</p>
+                    </div>
+                    <div class="trust-badge">
+                        <i class="fas fa-star"></i>
+                        <p>4.9 Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="hero__image" data-aos="fade-left">
+                <img src="{{ url_for('static', filename='images/hero-image.jpg') }}" alt="Pelatihan Renang">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2>Mengapa Memilih Kami</h2>
+            <p>Segala yang Anda butuhkan untuk mencapai tujuan renang Anda</p>
+        </div>
+
+        <div class="features__grid">
+            <!-- Feature Card 1 -->
+            <div class="feature-card" data-aos="fade-up">
+                <div class="feature-card__icon">
+                    <i class="fas fa-swimmer"></i>
+                </div>
+                <h3>Latihan Cerdas</h3>
+                <p>Rencana latihan yang dipersonalisasi dengan kekuatan AI yang beradaptasi dengan kemajuan Anda</p>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card__icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3>Pelatih Ahli</h3>
+                <p>Dapatkan bimbingan dari pelatih bersertifikat yang peduli dengan kesuksesan Anda</p>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card__icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Melacak Kemajuan</h3>
+                <p>Pantau kemajuan Anda dan tetap termotivasi dengan aplikasi seluler kami</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Social Proof Section -->
+<section class="social-proof">
+    <div class="container">
+        <div class="testimonial" data-aos="fade-up">
+            <div class="testimonial__content">
+                <div class="rating">★★★★★</div>
+                <blockquote>
+                    "Platform ini benar-benar mengubah pendekatan saya terhadap renang. 
+                    Latihan yang dipersonalisasi dan bimbingan membuat semua perbedaan."
+                </blockquote>
+                <div class="testimonial__author">
+                    <img src="{{ url_for('static', filename='images/testimonial1.jpg') }}" alt="Sarah">
+                    <div>
+                        <h4>Sarah Johnson</h4>
+                        <p>Menurunkan 30 lbs dalam 6 bulan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="container">
+        <div class="cta__box" data-aos="fade-up">
+            <h2>Siap untuk Memulai?</h2>
+            <p>Bergabunglah hari ini dan dapatkan bulan pertama gratis</p>
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-large">
+                Mulai Uji Coba Gratis
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <small>Tidak perlu kartu kredit</small>
+        </div>
+    </div>
+</section>
+{% endblock %} 
