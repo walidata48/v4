@@ -345,60 +345,63 @@ def coach_sessions():
     
     return render_template('coach_sessions.html', session_data=session_data)
 
-@app.route('/coach/check_users', methods=['POST'])
+@app.route('/coach/check_users', methods=['GET', 'POST'])
 def check_users():
     if 'user_id' not in session or not session.get('is_coach'):
         return redirect(url_for('login'))
     
-    checked_registration_ids = request.form.getlist('checked_users')
-    date_filter = request.form.get('date_filter')
+    # Get date filter from either POST or GET request
+    date_filter = request.form.get('date_filter') or request.args.get('date_filter')
+    if not date_filter:
+        date_filter = datetime.today().strftime('%Y-%m-%d')
     
-    if not checked_registration_ids:
-        flash('No users were selected.', 'error')
-        return redirect(url_for('dashboard'))
-    
-    try:
-        # Get the registrations that were checked
-        registrations = Registration.query\
-            .filter(Registration.id.in_(checked_registration_ids))\
-            .all()
+    if request.method == 'POST':
+        checked_registration_ids = request.form.getlist('checked_users')
         
-        # Create attendance records for each checked registration
-        for registration in registrations:
-            # Check if attendance record already exists
-            existing_attendance = Attendance.query.filter_by(
-                registration_id=registration.id,
-                date=registration.session_date
-            ).first()
+        if not checked_registration_ids:
+            flash('No users were selected.', 'error')
+            return redirect(url_for('dashboard'))
+        
+        try:
+            # Save attendance records
+            registrations = Registration.query\
+                .filter(Registration.id.in_(checked_registration_ids))\
+                .all()
             
-            if not existing_attendance:
-                attendance = Attendance(
-                    user_id=registration.user_id,
-                    coach_id=session['user_id'],
+            for registration in registrations:
+                existing_attendance = Attendance.query.filter_by(
                     registration_id=registration.id,
-                    date=registration.session_date
-                )
-                db.session.add(attendance)
-        
-        db.session.commit()
-        flash('Attendance recorded successfully!', 'success')
-        
-        # Fetch the newly created attendance records for display
-        attendances = Attendance.query\
-            .join(Registration)\
-            .join(User, Attendance.user_id == User.id)\
-            .filter(Attendance.registration_id.in_(checked_registration_ids))\
-            .all()
+                    date=datetime.strptime(date_filter, '%Y-%m-%d').date()
+                ).first()
+                
+                if not existing_attendance:
+                    attendance = Attendance(
+                        user_id=registration.user_id,
+                        coach_id=session['user_id'],
+                        registration_id=registration.id,
+                        date=datetime.strptime(date_filter, '%Y-%m-%d').date()
+                    )
+                    db.session.add(attendance)
             
-        return render_template('attendance_recap.html', 
-                             attendances=attendances,
-                             date=date_filter)
-                             
-    except Exception as e:
-        db.session.rollback()
-        flash('Error recording attendance. Please try again.', 'error')
-        print(f"Error: {str(e)}")  # For debugging
-        return redirect(url_for('dashboard'))
+            db.session.commit()
+            flash('Attendance recorded successfully!', 'success')
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Error recording attendance. Please try again.', 'error')
+            print(f"Error: {str(e)}")
+            return redirect(url_for('dashboard'))
+    
+    # Get all registrations for the selected date
+    all_registrations = Registration.query\
+        .join(User)\
+        .join(Session)\
+        .filter(Registration.session_date == datetime.strptime(date_filter, '%Y-%m-%d').date())\
+        .all()
+        
+    return render_template('attendance_recap.html', 
+                         registrations=all_registrations,
+                         date=date_filter)
 
 def update_session_date_counts():
     """Update the session date counts table based on registrations"""
