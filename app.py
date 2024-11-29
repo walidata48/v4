@@ -15,7 +15,9 @@ migrate = Migrate(app, db)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    if 'user_id' in session:
+        return render_template('home.html')
+    return render_template('landing.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -101,7 +103,7 @@ def dashboard():
                              registrations=registrations,
                              selected_date=date_filter)
     else:
-        return redirect(url_for('select_location'))
+        return redirect(url_for('home'))
 
 @app.route('/select_location', methods=['GET', 'POST'])
 def select_location():
