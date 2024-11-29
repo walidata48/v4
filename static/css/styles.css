@@ -39,12 +39,7 @@
     padding-left: 1.5rem;
 }
 
-.feature-list li:before {
-    content: "✓";
-    color: #28a745;
-    position: absolute;
-    left: 0;
-}
+
 
 .btn-membership {
     width: 100%;
