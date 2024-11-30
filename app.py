@@ -71,6 +71,8 @@ def dashboard():
         # Get date filter from request args
         date_filter = request.args.get('date_filter')
         time_filter = request.args.get('time_filter')
+        location_filter = request.args.get('location_filter')
+
         # Set default to today's date if no filter is applied
         if not date_filter:
             date_filter = datetime.today().strftime('%Y-%m-%d')
@@ -83,6 +85,9 @@ def dashboard():
             .all()
         time_slots = [start_time.strftime('%H:%M:%S') for (start_time,) in time_slots]
 
+        locations = Session.query.with_entities(Session.location).distinct().all()
+        locations = [location[0] for location in locations]
+
         # Query registrations with joined data, excluding those already marked
         registrations = Registration.query\
             .join(User, Registration.user_id == User.id)\
@@ -90,9 +95,10 @@ def dashboard():
             .outerjoin(Attendance, (Attendance.registration_id == Registration.id) & 
                        (Attendance.date == filter_date))\
             .filter(
-                Attendance.id == None,  # Only include registrations without attendance records
+                Attendance.id == None,  
                 Registration.session_date == filter_date,
-                Session.start_time == time_filter if time_filter else True  # Ensure the session date matches
+                Session.start_time == time_filter if time_filter else True,  
+                Session.location == location_filter if location_filter else True  
             )\
             .add_columns(
                 User.name.label('user_name'),
@@ -109,7 +115,9 @@ def dashboard():
                              registrations=registrations,
                              selected_date=date_filter,
                              selected_time=time_filter,
-                             time_slots=time_slots)
+                             selected_location=location_filter,
+                             time_slots=time_slots,
+                             locations=locations)
     else:
         return redirect(url_for('home'))
 

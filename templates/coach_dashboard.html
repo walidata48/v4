@@ -7,6 +7,17 @@
 <form method="GET" class="mb-4">
     <div class="row align-items-end">
         <div class="col-auto">
+            <label for="location_filter">Location:</label>
+            <select id="location_filter" name="location_filter" class="form-control">
+                <option value="">All Locations</option>
+                {% for location in locations %}
+                    <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
+                        {{ location }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
             <label for="date_filter">Date:</label>
             <input type="date" id="date_filter" name="date_filter" class="form-control" 
                    value="{{ selected_date }}" onchange="updateTimeSlots(this.value)">
