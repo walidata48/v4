@@ -49,10 +49,9 @@
         <thead>
             <tr>
                 <th>User Name</th>
-                <th>Session Location</th>
+                
                 <th>Session Day</th>
-                <th>Session Date</th>
-                <th>Time</th>
+                
                 <th>Mark Attendance</th>
             </tr>
         </thead>
@@ -60,10 +59,10 @@
             {% for reg in registrations %}
             <tr>
                 <td>{{ reg.user_name }}</td>
-                <td>{{ reg.location }}</td>
+                
                 <td>{{ reg.day }}</td>
-                <td>{{ reg.session_date.strftime('%Y-%m-%d') }}</td>
-                <td>{{ reg.start_time }} - {{ reg.end_time }}</td>
+                
+                
                 <td>
                     <input type="checkbox" name="checked_users" value="{{ reg.Registration.id }}">
                 </td>
@@ -84,26 +83,25 @@ function updateTimeSlots(date) {
     console.log('Updating time slots for date:', date);
     
     fetch(`/get_time_slots?date_filter=${date}`)
-        .then(response => {
-            console.log('Raw response:', response);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             console.log('Received data:', data);
             
             const timeSelect = document.getElementById('time_filter');
+            const currentValue = timeSelect.value;  // Store current selection
             timeSelect.innerHTML = '<option value="">All Times</option>';
             
             if (data.time_slots && data.time_slots.length > 0) {
                 data.time_slots.forEach(time => {
-                    console.log('Adding time slot:', time);
                     const option = document.createElement('option');
                     option.value = time;
                     option.textContent = time;
+                    // Restore the selected state if this was the previously selected time
+                    if (time === currentValue) {
+                        option.selected = true;
+                    }
                     timeSelect.appendChild(option);
                 });
-            } else {
-                console.log('No time slots received');
             }
         })
         .catch(error => console.error('Error:', error));
