@@ -56,7 +56,10 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['is_coach'] = user.is_coach
-            return redirect(url_for('coach_super_dashboard'))
+            if session['is_coach']:
+                return redirect(url_for('coach_super_dashboard'))
+            else:
+                return redirect(url_for('home'))
         else:
             return "Invalid email or password"
     return render_template('login.html')
