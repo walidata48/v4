@@ -11,57 +11,59 @@
 
     <!-- Filters Section -->
     <div class="filter-section p-4">
-        <div class="filter-container mb-4">
-            <!-- Filter Controls -->
-            <div class="filter-row">
-                <!-- Location Filter -->
-                <div class="filter-item">
-                    <label class="filter-label">Location:</label>
-                    <select id="location_filter" name="location_filter" class="form-select shadow-sm">
-                        <option value="">All Locations</option>
-                        {% for location in locations %}
-                            <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
-                                {{ location }}
-                            </option>
-                        {% endfor %}
-                    </select>
+        <form method="GET" action="{{ url_for('dashboard') }}">
+            <div class="filter-container mb-4">
+                <!-- Filter Controls -->
+                <div class="filter-row">
+                    <!-- Location Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">Location:</label>
+                        <select id="location_filter" name="location_filter" class="form-select shadow-sm">
+                            <option value="">All Locations</option>
+                            {% for location in locations %}
+                                <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
+                                    {{ location }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Date Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">Date:</label>
+                        <input type="date" 
+                               id="date_filter" 
+                               name="date_filter" 
+                               class="form-control shadow-sm" 
+                               value="{{ selected_date }}" 
+                               onchange="updateTimeSlots(this.value)">
+                    </div>
+
+                    <!-- Time Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">Time:</label>
+                        <select id="time_filter" name="time_filter" class="form-select shadow-sm">
+                            <option value="">All Times</option>
+                            {% for time in time_slots %}
+                                <option value="{{ time }}" {% if time == selected_time %}selected{% endif %}>
+                                    {{ time }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Date Filter -->
-                <div class="filter-item">
-                    <label class="filter-label">Date:</label>
-                    <input type="date" 
-                           id="date_filter" 
-                           name="date_filter" 
-                           class="form-control shadow-sm" 
-                           value="{{ selected_date }}" 
-                           onchange="updateTimeSlots(this.value)">
-                </div>
-
-                <!-- Time Filter -->
-                <div class="filter-item">
-                    <label class="filter-label">Time:</label>
-                    <select id="time_filter" name="time_filter" class="form-select shadow-sm">
-                        <option value="">All Times</option>
-                        {% for time in time_slots %}
-                            <option value="{{ time }}" {% if time == selected_time %}selected{% endif %}>
-                                {{ time }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-funnel me-2"></i>Apply Filters
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                    </a>
                 </div>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="d-flex gap-2 justify-content-end mt-4">
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-funnel me-2"></i>Apply Filters
-                </button>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
-                </a>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Registrations Section -->
