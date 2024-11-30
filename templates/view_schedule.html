@@ -4,34 +4,35 @@
 <h1>My Schedule</h1>
 
 {% if weekly_schedules %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Location</th>
-            <th>Day</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for schedule in weekly_schedules %}
-        <tr>
-            <td>{{ schedule.location }}</td>
-            <td>{{ schedule.day }}</td>
-            <td>{{ schedule.date.strftime('%d %B %Y') }}</td>
-            <td>{{ schedule.start_time.strftime('%H:%M') }} - {{ schedule.end_time.strftime('%H:%M') }}</td>
-            <td>
-                {% if loop.index == weekly_schedules|length %}
-                    <form method="GET" action="{{ url_for('edit_registration', registration_id=schedule.registration_id) }}">
-                        <button type="submit" class="btn btn-primary">Edit</button>
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    
+    <h4 class="mb-3 text-primary">{{ weekly_schedules[0].location }}</h4>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in weekly_schedules %}
+            <tr>
+                <td>{{ schedule.day }}</td>
+                <td>{{ schedule.date.strftime('%d %B %Y') }}</td>
+                <td>{{ schedule.start_time.strftime('%H:%M') }} - {{ schedule.end_time.strftime('%H:%M') }}</td>
+                <td>
+                    {% if loop.index == weekly_schedules|length %}
+                        <form method="GET" action="{{ url_for('edit_registration', registration_id=schedule.registration_id) }}">
+                            <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
 <p>You haven't registered for any sessions yet.</p>
 {% endif %}
