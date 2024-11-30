@@ -108,6 +108,7 @@ def dashboard():
                              user=user, 
                              registrations=registrations,
                              selected_date=date_filter,
+                             selected_time=time_filter,
                              time_slots=time_slots)
     else:
         return redirect(url_for('home'))
