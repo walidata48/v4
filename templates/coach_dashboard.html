@@ -1,83 +1,274 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Welcome, Coach {{ user.name }}</h2>
-
-<!-- Add date filter form -->
-<form method="GET" class="mb-4">
-    <div class="row align-items-end">
-        <div class="col-auto">
-            <label for="location_filter">Location:</label>
-            <select id="location_filter" name="location_filter" class="form-control">
-                <option value="">All Locations</option>
-                {% for location in locations %}
-                    <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
-                        {{ location }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-auto">
-            <label for="date_filter">Date:</label>
-            <input type="date" id="date_filter" name="date_filter" class="form-control" 
-                   value="{{ selected_date }}" onchange="updateTimeSlots(this.value)">
-        </div>
-        
-        <div class="col-auto">
-            <label for="time_filter">Time:</label>
-            <select id="time_filter" name="time_filter" class="form-control">
-                <option value="">All Times</option>
-                {% for time in time_slots %}
-                    <option value="{{ time }}" {% if time == selected_time %}selected{% endif %}>
-                        {{ time }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">Reset</a>
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title h4 mb-0">Welcome, Coach {{ user.name }}</h2>
         </div>
     </div>
-</form>
 
-<h3>Registrations</h3>
-<form method="POST" action="{{ url_for('check_users') }}">
-    <input type="hidden" name="date_filter" value="{{ selected_date }}">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>User Name</th>
-                
-                <th>Session Day</th>
-                
-                <th>Mark Attendance</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reg in registrations %}
-            <tr>
-                <td>{{ reg.user_name }}</td>
-                
-                <td>{{ reg.day }}</td>
-                
-                
-                <td>
-                    <input type="checkbox" name="checked_users" value="{{ reg.Registration.id }}">
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary mb-4">Submit Attendance</button>
-</form>
+    <!-- Filters Section -->
+    <div class="filter-section p-4">
+        <div class="filter-container mb-4">
+            <!-- Filter Controls -->
+            <div class="filter-row">
+                <!-- Location Filter -->
+                <div class="filter-item">
+                    <label class="filter-label">Location:</label>
+                    <select id="location_filter" name="location_filter" class="form-select shadow-sm">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                            <option value="{{ location }}" {% if location == selected_location %}selected{% endif %}>
+                                {{ location }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-{% if not registrations %}
-<p>No registrations found for the selected date.</p>
-{% endif %}
+                <!-- Date Filter -->
+                <div class="filter-item">
+                    <label class="filter-label">Date:</label>
+                    <input type="date" 
+                           id="date_filter" 
+                           name="date_filter" 
+                           class="form-control shadow-sm" 
+                           value="{{ selected_date }}" 
+                           onchange="updateTimeSlots(this.value)">
+                </div>
 
-<!-- Add this JavaScript at the bottom of your template -->
+                <!-- Time Filter -->
+                <div class="filter-item">
+                    <label class="filter-label">Time:</label>
+                    <select id="time_filter" name="time_filter" class="form-select shadow-sm">
+                        <option value="">All Times</option>
+                        {% for time in time_slots %}
+                            <option value="{{ time }}" {% if time == selected_time %}selected{% endif %}>
+                                {{ time }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-funnel me-2"></i>Apply Filters
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registrations Section -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title h5 mb-3">Registrations</h3>
+            
+            <form method="POST" action="{{ url_for('check_users') }}">
+                <input type="hidden" name="date_filter" value="{{ selected_date }}">
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User Name</th>
+                                <th>Session Day</th>
+                                <th class="text-center">Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in registrations %}
+                            <tr>
+                                <td>{{ reg.user_name }}</td>
+                                <td>{{ reg.day }}</td>
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="checked_users" value="{{ reg.Registration.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not registrations %}
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No registrations found for the selected date.
+                </div>
+                {% else %}
+                <div class="d-grid d-md-flex justify-content-md-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check2-square me-1"></i>
+                        Submit Attendance
+                    </button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Bootstrap Icons CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+<style>
+/* Custom CSS */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+}
+
+.form-check-input {
+    cursor: pointer;
+    width: 1.2em;
+    height: 1.2em;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Add these styles to your existing CSS */
+.filter-section {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.filter-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 250px;
+    gap: 1rem;
+}
+
+.filter-label {
+    font-weight: 500;
+    min-width: 80px;
+    margin-bottom: 0;
+    color: #495057;
+}
+
+.form-select, .form-control {
+    flex: 1;
+    height: 2.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.1);
+}
+
+.btn {
+    height: 2.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    padding: 0 1.5rem;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-1px);
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .filter-section {
+        padding: 1rem !important;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-item {
+        min-width: 100%;
+    }
+    
+    .filter-label {
+        min-width: 70px;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+
 <script>
 function updateTimeSlots(date) {
     console.log('Updating time slots for date:', date);
@@ -88,7 +279,7 @@ function updateTimeSlots(date) {
             console.log('Received data:', data);
             
             const timeSelect = document.getElementById('time_filter');
-            const currentValue = timeSelect.value;  // Store current selection
+            const currentValue = timeSelect.value;
             timeSelect.innerHTML = '<option value="">All Times</option>';
             
             if (data.time_slots && data.time_slots.length > 0) {
@@ -96,7 +287,6 @@ function updateTimeSlots(date) {
                     const option = document.createElement('option');
                     option.value = time;
                     option.textContent = time;
-                    // Restore the selected state if this was the previously selected time
                     if (time === currentValue) {
                         option.selected = true;
                     }
@@ -113,7 +303,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTimeSlots(this.value);
     });
     
-    // Load initial time slots if date is set
     if (dateFilter.value) {
         updateTimeSlots(dateFilter.value);
     }
