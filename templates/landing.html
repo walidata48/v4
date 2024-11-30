@@ -4,121 +4,154 @@
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
-        <div class="hero__content">
-            <!-- Left Content -->
-            <div class="hero__text" data-aos="fade-up">
-                <h1 class="hero__title">
-                    Mulai Perjalanan Renang Anda <span class="gradient-text">Hari Ini</span>
-                </h1>
-                <p class="hero__subtitle">
-                    Bergabunglah dengan komunitas kami dan ubah hidup Anda dengan latihan yang dipersonalisasi, 
-                    bimbingan ahli, dan hasil yang terbukti.
-                </p>
-
-                <!-- CTA Buttons -->
-                <div class="hero__actions">
-                    <a href="{{ url_for('register') }}" class="btn btn-primary">
-                        Mulai Gratis
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline">
-                        Masuk
-                    </a>
-                </div>
-
-                <!-- Trust Indicators -->
-                <div class="trust-badges">
-                    <div class="trust-badge">
-                        <i class="fas fa-users"></i>
-                        <p>10k+ Pengguna Aktif</p>
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-7 mb-5 mb-lg-0">
+                <div class="hero-content">
+                    <div class="badge-pill mb-4">
+                        <i class="fas fa-star me-2"></i>
+                        Rating 4.9 dari 2000+ Siswa
                     </div>
-                    <div class="trust-badge">
-                        <i class="fas fa-star"></i>
-                        <p>4.9 Rating</p>
+                    <h1 class="display-3 fw-bold mb-4">
+                        Belajar Berenang dengan 
+                        <span class="text-gradient">Pelatih Profesional</span>
+                    </h1>
+                    <p class="lead text-secondary mb-5">
+                        Bergabunglah dengan program renang kami dan kuasai teknik berenang 
+                        bersama instruktur bersertifikat dalam lingkungan yang aman.
+                    </p>
+                    
+                    <!-- Auth Buttons -->
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            Daftar Sekarang <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">
+                            Masuk
+                        </a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="row g-4 stats-container">
+                        <div class="col-6 col-md-4">
+                            <div class="stat-card">
+                                <h3 class="stat-number">10k+</h3>
+                                <p class="stat-label">Siswa Aktif</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6 col-md-4">
+                            <div class="stat-card">
+                                <h3 class="stat-number">15+</h3>
+                                <p class="stat-label">Pelatih Pro</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Right Content -->
-            <div class="hero__image" data-aos="fade-left">
-                <img src="{{ url_for('static', filename='images/hero-image.jpg') }}" alt="Pelatihan Renang">
+            
+            <!-- Right Side - Decorative Element -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-decoration">
+                    <div class="decoration-circle"></div>
+                    <div class="decoration-dots"></div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Features Section -->
-<section class="features">
+<section class="features py-7">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
-            <h2>Mengapa Memilih Kami</h2>
-            <p>Segala yang Anda butuhkan untuk mencapai tujuan renang Anda</p>
+        <div class="row justify-content-center text-center mb-5">
+            <div class="col-lg-6">
+                <div class="section-tag mb-3">
+                    <i class="fas fa-check-circle me-2"></i>Mengapa Memilih Kami
+                </div>
+                <h2 class="display-5 fw-bold">Keunggulan Program Kami</h2>
+            </div>
         </div>
 
-        <div class="features__grid">
-            <!-- Feature Card 1 -->
-            <div class="feature-card" data-aos="fade-up">
-                <div class="feature-card__icon">
-                    <i class="fas fa-swimmer"></i>
+        <div class="row g-4">
+            <div class="col-12 col-md-4 mb-4 mb-md-0">
+                <div class="feature-card">
+                    <i class="fas fa-medal feature-icon"></i>
+                    <h3>Pelatihan Profesional</h3>
+                    <p>Belajar dari pelatih renang bersertifikat dengan pengalaman bertahun-tahun</p>
                 </div>
-                <h3>Latihan Cerdas</h3>
-                <p>Rencana latihan yang dipersonalisasi dengan kekuatan AI yang beradaptasi dengan kemajuan Anda</p>
             </div>
-
-            <!-- Feature Card 2 -->
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-card__icon">
-                    <i class="fas fa-user-shield"></i>
+            <div class="col-12 col-md-4 mb-4 mb-md-0">
+                <div class="feature-card active">
+                    <i class="fas fa-chart-line feature-icon"></i>
+                    <h3>Pantau Kemajuan</h3>
+                    <p>Lacak peningkatan Anda dengan sistem pemantauan yang detail</p>
                 </div>
-                <h3>Pelatih Ahli</h3>
-                <p>Dapatkan bimbingan dari pelatih bersertifikat yang peduli dengan kesuksesan Anda</p>
             </div>
-
-            <!-- Feature Card 3 -->
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="feature-card__icon">
-                    <i class="fas fa-mobile-alt"></i>
+            <div class="col-12 col-md-4 mb-4 mb-md-0">
+                <div class="feature-card">
+                    <i class="fas fa-users feature-icon"></i>
+                    <h3>Kelompok Kecil</h3>
+                    <p>Perhatian personal dengan sesi latihan kelompok kecil</p>
                 </div>
-                <h3>Melacak Kemajuan</h3>
-                <p>Pantau kemajuan Anda dan tetap termotivasi dengan aplikasi seluler kami</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Social Proof Section -->
-<section class="social-proof">
+<!-- Pricing Section -->
+<section class="pricing py-7 bg-light">
     <div class="container">
-        <div class="testimonial" data-aos="fade-up">
-            <div class="testimonial__content">
-                <div class="rating">★★★★★</div>
-                <blockquote>
-                    "Platform ini benar-benar mengubah pendekatan saya terhadap renang. 
-                    Latihan yang dipersonalisasi dan bimbingan membuat semua perbedaan."
-                </blockquote>
-                <div class="testimonial__author">
-                    <img src="{{ url_for('static', filename='images/testimonial1.jpg') }}" alt="Sarah">
-                    <div>
-                        <h4>Sarah Johnson</h4>
-                        <p>Menurunkan 30 lbs dalam 6 bulan</p>
+        <div class="row justify-content-center text-center mb-5">
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold mb-3">Pilihan Paket</h2>
+                <p class="lead">Pilih paket yang sesuai dengan perjalanan renang Anda</p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-md-4">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Pemula</h3>
+                        <div class="price">
+                            <span class="currency">Rp</span>
+                            <span class="amount">499k</span>
+                            <span class="period">/bulan</span>
+                        </div>
                     </div>
+                    <div class="pricing-features">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check me-2"></i>2 Sesi per minggu</li>
+                            <li><i class="fas fa-check me-2"></i>Pelatihan teknik dasar</li>
+                            <li><i class="fas fa-check me-2"></i>Pemantauan kemajuan</li>
+                        </ul>
+                    </div>
+                    <a href="#" class="btn btn-outline-primary w-100">Mulai Sekarang</a>
                 </div>
             </div>
+            <!-- Add more pricing cards as needed -->
         </div>
     </div>
 </section>
 
 <!-- CTA Section -->
-<section class="cta">
+<section class="cta py-7">
     <div class="container">
-        <div class="cta__box" data-aos="fade-up">
-            <h2>Siap untuk Memulai?</h2>
-            <p>Bergabunglah hari ini dan dapatkan bulan pertama gratis</p>
-            <a href="{{ url_for('register') }}" class="btn btn-primary btn-large">
-                Mulai Uji Coba Gratis
-                <i class="fas fa-arrow-right"></i>
-            </a>
-            <small>Tidak perlu kartu kredit</small>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="cta-card text-center">
+                    <h2 class="display-6 fw-bold mb-4">Siap Untuk Mulai Berenang?</h2>
+                    <p class="lead mb-4">Gabung sekarang dan dapatkan minggu pertama gratis!</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            Mulai Trial Gratis
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-lg">
+                            Pelajari Lebih Lanjut
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
