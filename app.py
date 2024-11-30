@@ -68,27 +68,25 @@ def dashboard():
     
     user = User.query.get(session['user_id'])
     if session['is_coach']:
-        # Get date filter from request args
         date_filter = request.args.get('date_filter')
         time_filter = request.args.get('time_filter')
         location_filter = request.args.get('location_filter')
 
-        # Set default to today's date if no filter is applied
         if not date_filter:
             date_filter = datetime.today().strftime('%Y-%m-%d')
         
-        # Convert string date to datetime for filtering
         filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+
         time_slots = db.session.query(Session.start_time)\
             .filter(Session.day == filter_date.strftime('%A'))\
             .distinct()\
             .all()
         time_slots = [start_time.strftime('%H:%M:%S') for (start_time,) in time_slots]
+        print(f"Time slots for {filter_date}: {time_slots}")
 
         locations = Session.query.with_entities(Session.location).distinct().all()
         locations = [location[0] for location in locations]
 
-        # Query registrations with joined data, excluding those already marked
         registrations = Registration.query\
             .join(User, Registration.user_id == User.id)\
             .join(Session, Registration.session_id == Session.id)\

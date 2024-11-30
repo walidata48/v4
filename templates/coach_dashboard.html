@@ -81,23 +81,44 @@
 <!-- Add this JavaScript at the bottom of your template -->
 <script>
 function updateTimeSlots(date) {
-    // Make an AJAX request to get time slots for the selected date
-    fetch(`/get_time_slots?date=${date}`)
-        .then(response => response.json())
+    console.log('Updating time slots for date:', date);
+    
+    fetch(`/get_time_slots?date_filter=${date}`)
+        .then(response => {
+            console.log('Raw response:', response);
+            return response.json();
+        })
         .then(data => {
+            console.log('Received data:', data);
+            
             const timeSelect = document.getElementById('time_filter');
             timeSelect.innerHTML = '<option value="">All Times</option>';
             
-            data.time_slots.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
-            
-            // Automatically submit the form after updating time slots
-            document.querySelector('form').submit();
-        });
+            if (data.time_slots && data.time_slots.length > 0) {
+                data.time_slots.forEach(time => {
+                    console.log('Adding time slot:', time);
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = time;
+                    timeSelect.appendChild(option);
+                });
+            } else {
+                console.log('No time slots received');
+            }
+        })
+        .catch(error => console.error('Error:', error));
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dateFilter = document.getElementById('date_filter');
+    dateFilter.addEventListener('change', function() {
+        updateTimeSlots(this.value);
+    });
+    
+    // Load initial time slots if date is set
+    if (dateFilter.value) {
+        updateTimeSlots(dateFilter.value);
+    }
+});
 </script>
 {% endblock %} 
