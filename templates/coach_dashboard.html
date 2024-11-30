@@ -7,13 +7,26 @@
 <form method="GET" class="mb-4">
     <div class="row align-items-end">
         <div class="col-auto">
-            <label for="date_filter">Filter by Date:</label>
+            <label for="date_filter">Date:</label>
             <input type="date" id="date_filter" name="date_filter" class="form-control" 
-                   value="{{ selected_date }}">
+                   value="{{ selected_date }}" onchange="updateTimeSlots(this.value)">
         </div>
+        
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Reset</a>
+            <label for="time_filter">Time:</label>
+            <select id="time_filter" name="time_filter" class="form-control">
+                <option value="">All Times</option>
+                {% for time in time_slots %}
+                    <option value="{{ time }}" {% if time == selected_time %}selected{% endif %}>
+                        {{ time }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">Reset</a>
         </div>
     </div>
 </form>
@@ -53,4 +66,27 @@
 {% if not registrations %}
 <p>No registrations found for the selected date.</p>
 {% endif %}
+
+<!-- Add this JavaScript at the bottom of your template -->
+<script>
+function updateTimeSlots(date) {
+    // Make an AJAX request to get time slots for the selected date
+    fetch(`/get_time_slots?date=${date}`)
+        .then(response => response.json())
+        .then(data => {
+            const timeSelect = document.getElementById('time_filter');
+            timeSelect.innerHTML = '<option value="">All Times</option>';
+            
+            data.time_slots.forEach(time => {
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                timeSelect.appendChild(option);
+            });
+            
+            // Automatically submit the form after updating time slots
+            document.querySelector('form').submit();
+        });
+}
+</script>
 {% endblock %} 

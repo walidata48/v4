@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Session, Registration, RegistrationGroup, SessionDateCount, Attendance
 from config import Config
@@ -70,14 +70,19 @@ def dashboard():
     if session['is_coach']:
         # Get date filter from request args
         date_filter = request.args.get('date_filter')
-        
+        time_filter = request.args.get('time_filter')
         # Set default to today's date if no filter is applied
         if not date_filter:
             date_filter = datetime.today().strftime('%Y-%m-%d')
         
         # Convert string date to datetime for filtering
         filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-        
+        time_slots = db.session.query(Session.start_time)\
+            .filter(Session.day == filter_date.strftime('%A'))\
+            .distinct()\
+            .all()
+        time_slots = [start_time.strftime('%H:%M:%S') for (start_time,) in time_slots]
+
         # Query registrations with joined data, excluding those already marked
         registrations = Registration.query\
             .join(User, Registration.user_id == User.id)\
@@ -86,7 +91,8 @@ def dashboard():
                        (Attendance.date == filter_date))\
             .filter(
                 Attendance.id == None,  # Only include registrations without attendance records
-                Registration.session_date == filter_date  # Ensure the session date matches
+                Registration.session_date == filter_date,
+                Session.start_time == time_filter if time_filter else True  # Ensure the session date matches
             )\
             .add_columns(
                 User.name.label('user_name'),
@@ -101,7 +107,8 @@ def dashboard():
         return render_template('coach_dashboard.html', 
                              user=user, 
                              registrations=registrations,
-                             selected_date=date_filter)
+                             selected_date=date_filter,
+                             time_slots=time_slots)
     else:
         return redirect(url_for('home'))
 
@@ -538,6 +545,20 @@ def coach_settings():
     if 'user_id' not in session or not session.get('is_coach'):
         return redirect(url_for('login'))
     return render_template('coach_settings.html')
+
+@app.route('/get_time_slots')
+def get_time_slots():
+    date_filter = request.args.get('date_filter')
+    if date_filter:
+        filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+        # Get time slots for the selected day
+        time_slots = db.session.query(Session.start_time)\
+            .filter(Session.day == filter_date.strftime('%A'))\
+            .distinct()\
+            .all()
+        time_slots = [start_time.strftime('%H:%M:%S') for (start_time,) in time_slots]
+        return jsonify({'time_slots': time_slots})
+    return jsonify({'time_slots': []})
 
 if __name__ == '__main__':
     with app.app_context():
